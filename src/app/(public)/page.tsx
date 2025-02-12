@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Stack, Box } from "@mantine/core";
 import { PaperBrowser, PaperBrowserProps } from "@/components/paper-browser";
 import { getNotes } from "@/lib/actions/papers";
@@ -13,7 +13,19 @@ const filterPapers = (papers: PaperBrowserProps["papers"], search: string) => {
   });
 };
 
-export default async function Page({
+export default async function DefPage({
+  searchParams,
+}: {
+  searchParams: Promise<PaperBrowserProps["searchParams"]>;
+}) {
+  return (
+    <Suspense fallback={<div>loading.....</div>}>
+      <Page searchParams={searchParams} />
+    </Suspense>
+  );
+}
+
+async function Page({
   searchParams,
 }: {
   searchParams: Promise<PaperBrowserProps["searchParams"]>;
