@@ -1,9 +1,19 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useDebouncedValue } from "@mantine/hooks";
 import { conferences } from "@/config/conferences";
+import { getNotes, Note } from "@/lib/actions/papers";
 
 export type PaperBrowserSearchParams = { invitation?: string; search?: string };
+
+const filterPapers = (papers: Note[], search: string) => {
+  // Filter papers by search term
+  return papers.filter((paper) => {
+    return paper.content?.title.value
+      .toLowerCase()
+      .includes(search.toLowerCase());
+  });
+};
 
 export default function usePapers({
   searchParams,
@@ -12,6 +22,9 @@ export default function usePapers({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [isFetching, startTransition] = useTransition();
 
   // State for current values
   const [currentSearch, setCurrentSearch] = useState(searchParams.search || "");
@@ -42,14 +55,10 @@ export default function usePapers({
     else router.push(pathname);
   };
 
-  // const handleSearchChange = (searchTerm: string) => {
-  //     router.push(
-  //         pathname + "?" + createQueryString("search", searchTerm)
-  //       );
-  // }
-
   // Find the matching conference label for the current invitation
-  const currentConference = searchParams.invitation;
+  const currentConference =
+    conferences.find((conf) => conf.invitation === searchParams.invitation)
+      ?.label || "";
 
   // Update URL when debounced search changes
   useEffect(() => {
@@ -69,7 +78,28 @@ export default function usePapers({
     setCurrentSearch(value);
   }, []);
 
+  // When the searchParams change, update the current search
+  useEffect(() => {
+    startTransition(async () => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { search, ...filteredSearchParams } = searchParams;
+        const notes = await getNotes(filteredSearchParams);
+        setNotes(notes);
+      } catch (error: unknown) {
+        console.error(error);
+        setError(
+          error instanceof Error ? error.message : "Failed to load papers."
+        );
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams.invitation]);
+
   return {
+    isFetching,
+    error,
+    notes: filterPapers(notes, debouncedSearch),
     conferences,
     currentConference,
     currentSearch,

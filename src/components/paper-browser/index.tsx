@@ -10,23 +10,20 @@ import {
   Group,
   Autocomplete,
   Box,
+  Center,
 } from "@mantine/core";
 import usePapers from "./usePapers";
-import { Note } from "@/lib/actions/papers";
 import { IconBooks, IconSearch } from "@tabler/icons-react";
 
 export type PaperBrowserProps = {
-  papers: Note[];
-  helperText?: string;
   searchParams: { invitation?: string; search?: string };
 };
 
-export function PaperBrowser({
-  papers,
-  helperText,
-  searchParams,
-}: PaperBrowserProps) {
+export function PaperBrowser({ searchParams }: PaperBrowserProps) {
   const {
+    isFetching,
+    error,
+    notes,
     conferences,
     currentConference,
     currentSearch,
@@ -43,7 +40,11 @@ export function PaperBrowser({
           placeholder="Choose a conference"
           data={conferences.map(({ label }) => label)} // Only pass labels as data
           value={currentConference || ""} // Use the label for value
-          onChange={(value) => {
+          onChange={(label) => {
+            // find matching conf.inviation
+            const value =
+              conferences.find((conf) => conf.label === label)?.invitation ||
+              "";
             handleConferenceChange(value);
           }}
           leftSection={<IconBooks size={16} />}
@@ -60,9 +61,9 @@ export function PaperBrowser({
         />
       </Group>
 
-      {helperText && (
-        <Text size="sm" c="dimmed">
-          {helperText}
+      {error && (
+        <Text size="sm" c="red">
+          {error}
         </Text>
       )}
 
@@ -73,39 +74,51 @@ export function PaperBrowser({
           overflow: "auto",
         }}
       >
-        <Stack gap={"md"}>
-          {papers.map((paper, index) => (
-            <Card key={index} shadow="sm" padding="lg" radius="md" withBorder>
-              <Stack>
-                <Title order={5}>
-                  {paper.content?.title.value || "Untitled"}
-                </Title>
+        {!searchParams.invitation ? (
+          <Center h="100%">
+            <Text>Select a conference to view papers</Text>
+          </Center>
+        ) : isFetching ? (
+          <Center h="100%">
+            <Text>Loading...</Text>
+          </Center>
+        ) : notes.length > 0 ? (
+          <Stack gap={"md"}>
+            {notes.map((paper, index) => (
+              <Card key={index} shadow="sm" padding="lg" radius="md" withBorder>
+                <Stack>
+                  <Title order={5}>
+                    {paper.content?.title.value || "Untitled"}
+                  </Title>
 
-                <Text size="sm" c="dimmed">
-                  {paper.content?.authors?.value.join(", ") ||
-                    "No authors listed"}
-                </Text>
-
-                {paper.content?.abstract && (
-                  <Text size="sm" lineClamp={3}>
-                    {paper.content.abstract.value}
+                  <Text size="sm" c="dimmed">
+                    {paper.content?.authors?.value.join(", ") ||
+                      "No authors listed"}
                   </Text>
-                )}
 
-                {paper.content?.pdf && (
-                  <Anchor
-                    href={`https://openreview.net/pdf?id=${paper.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    size="sm"
-                  >
-                    View PDF
-                  </Anchor>
-                )}
-              </Stack>
-            </Card>
-          ))}
-        </Stack>
+                  {paper.content?.abstract && (
+                    <Text size="sm" lineClamp={3}>
+                      {paper.content.abstract.value}
+                    </Text>
+                  )}
+
+                  {paper.content?.pdf && (
+                    <Anchor
+                      href={`https://openreview.net/pdf?id=${paper.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      size="sm"
+                    >
+                      View PDF
+                    </Anchor>
+                  )}
+                </Stack>
+              </Card>
+            ))}
+          </Stack>
+        ) : (
+          <Text>No papers found</Text>
+        )}
       </Box>
     </Stack>
   );

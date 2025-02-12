@@ -1,8 +1,6 @@
 // Import styles of packages that you've installed.
 // All packages except `@mantine/hooks` require styles imports
-import "@gfazioli/mantine-split-pane/styles.css";
 import "@mantine/core/styles.css";
-import "@mantine/charts/styles.css";
 
 import {
   ColorSchemeScript,
@@ -12,8 +10,8 @@ import {
 import { theme } from "@/config/theme";
 
 export const metadata = {
-  title: "Dekki",
-  description: "Learn More, Study Less",
+  title: "Paperz",
+  description: "Find relevant papers for your research",
 };
 
 export default function RootLayout({
