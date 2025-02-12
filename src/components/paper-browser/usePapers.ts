@@ -39,10 +39,17 @@ export default function usePapers({searchParams}: {searchParams: {invitation?: s
           );
     }
 
+    const handleSearchChange = (searchTerm: string) => {
+        router.push(
+            pathname + "?" + createQueryString("search", searchTerm)
+          );
+    }
+
   return (
     {
         conferences,
         handleConferenceChange,
+        handleSearchChange
     }
   )
 }

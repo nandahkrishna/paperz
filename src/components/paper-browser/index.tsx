@@ -1,41 +1,79 @@
 // ConferencePapers.tsx
 "use client";
 import {
-  Select,
   Title,
   Text,
   Stack,
-  Container,
   Anchor,
   Card,
+  TextInput,
+  Group,
+  Autocomplete,
+  Box,
 } from "@mantine/core";
 import usePapers from "./usePapers";
 import { Note } from "@/lib/actions/papers";
+import { IconBooks, IconSearch } from "@tabler/icons-react";
 
-// dict_keys(['title', 'authors', 'authorids', 'keywords', 'TLDR', 'abstract', 'primary_area', 'venue', 'venueid', 'pdf', '_bibtex', 'paperhash'])
 export type PaperBrowserProps = {
   papers: Note[];
-  searchParams: { invitation?: string };
+  helperText?: string;
+  searchParams: { invitation?: string; search?: string };
 };
 
-export function PaperBrowser({ papers, searchParams }: PaperBrowserProps) {
-  const { conferences, handleConferenceChange } = usePapers({ searchParams });
+export function PaperBrowser({
+  papers,
+  helperText,
+  searchParams,
+}: PaperBrowserProps) {
+  const { conferences, handleConferenceChange, handleSearchChange } = usePapers(
+    { searchParams }
+  );
 
   return (
-    <Container size="lg" py="xl">
-      <Stack gap="xl">
-        <Title order={1}>Conference Papers</Title>
+    <Stack gap="xl" h="100%">
+      {/* <Title order={1}>Conference Papers</Title> */}
 
-        <Select
-          label="Select Conference"
+      <Group align="center">
+        <Autocomplete
+          label="Conference"
           placeholder="Choose a conference"
           data={conferences.map(({ label, invitation }) => ({
             label,
             value: invitation,
           }))}
-          onChange={(value) => value && handleConferenceChange(value)}
+          onChange={(value) => {
+            const conference = conferences.find((conf) => conf.label === value);
+            if (conference) {
+              handleConferenceChange(conference.invitation);
+            }
+          }}
+          leftSection={<IconBooks size={16} />}
+          radius="md"
         />
+        <TextInput
+          flex={1}
+          label="Search term"
+          placeholder="Search for papers"
+          onChange={(event) => handleSearchChange(event.currentTarget.value)}
+          leftSection={<IconSearch size={16} />}
+          radius="md"
+        />
+      </Group>
 
+      {helperText && (
+        <Text size="sm" c="dimmed">
+          {helperText}
+        </Text>
+      )}
+
+      <Box
+        style={{
+          flex: 1,
+          minHeight: 0, // Critical for nested flex containers
+          overflow: "auto",
+        }}
+      >
         <Stack gap={"md"}>
           {papers.map((paper, index) => (
             <Card key={index} shadow="sm" padding="lg" radius="md" withBorder>
@@ -69,7 +107,7 @@ export function PaperBrowser({ papers, searchParams }: PaperBrowserProps) {
             </Card>
           ))}
         </Stack>
-      </Stack>
-    </Container>
+      </Box>
+    </Stack>
   );
 }

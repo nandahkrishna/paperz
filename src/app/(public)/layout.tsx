@@ -1,6 +1,7 @@
 // app/(public)/layout.tsx
-import { Logo } from "@/lib/icons/logo";
-import { Container, Group, Stack } from "@mantine/core";
+import { ColorSchemeToggle } from "@/components/color-scheme-toggle";
+import { Box, Container, Group, Stack, Text } from "@mantine/core";
+import { IconBrain } from "@tabler/icons-react";
 
 export default function PublicLayout({
   children,
@@ -17,9 +18,19 @@ export default function PublicLayout({
             paddingTop: 10,
           }}
         >
-          <Logo />
+          <Group justify="space-between" align="center" w="100%">
+            <Group>
+              <IconBrain size={28} stroke={1.5} />
+              <Text size="xl" fw={700}>
+                Paperz
+              </Text>
+            </Group>
+            <ColorSchemeToggle />
+          </Group>
         </Group>
-        {children}
+        <Box flex={1} style={{ overflowY: "hidden" }}>
+          {children}
+        </Box>
       </Stack>
     </Container>
   );
