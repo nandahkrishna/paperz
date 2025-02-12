@@ -2,6 +2,7 @@ import React from "react";
 import { Stack, Box } from "@mantine/core";
 import { PaperBrowser, PaperBrowserProps } from "@/components/paper-browser";
 import { getNotes } from "@/lib/actions/papers";
+import { conferences } from "@/config/conferences";
 
 const filterPapers = (papers: PaperBrowserProps["papers"], search: string) => {
   // Filter papers by search term
@@ -18,7 +19,10 @@ export default async function Page({
   searchParams: Promise<PaperBrowserProps["searchParams"]>;
 }) {
   const awaitedSearchParams = await searchParams;
-  const { search, invitation } = awaitedSearchParams;
+  const { search, invitation: invitationLabel } = awaitedSearchParams;
+  const invitation = conferences.find(
+    (c) => c.label === invitationLabel
+  )?.invitation;
   const notes = invitation
     ? await getNotes({
         invitation,

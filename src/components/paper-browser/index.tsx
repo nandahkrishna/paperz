@@ -26,27 +26,25 @@ export function PaperBrowser({
   helperText,
   searchParams,
 }: PaperBrowserProps) {
-  const { conferences, handleConferenceChange, handleSearchChange } = usePapers(
-    { searchParams }
-  );
+  const {
+    conferences,
+    currentConference,
+    currentSearch,
+    handleConferenceChange,
+    handleSearchChange,
+  } = usePapers({ searchParams });
 
   return (
     <Stack gap="xl" h="100%">
-      {/* <Title order={1}>Conference Papers</Title> */}
-
       <Group align="center">
         <Autocomplete
+          clearable
           label="Conference"
           placeholder="Choose a conference"
-          data={conferences.map(({ label, invitation }) => ({
-            label,
-            value: invitation,
-          }))}
+          data={conferences.map(({ label }) => label)} // Only pass labels as data
+          value={currentConference || ""} // Use the label for value
           onChange={(value) => {
-            const conference = conferences.find((conf) => conf.label === value);
-            if (conference) {
-              handleConferenceChange(conference.invitation);
-            }
+            handleConferenceChange(value);
           }}
           leftSection={<IconBooks size={16} />}
           radius="md"
@@ -56,6 +54,7 @@ export function PaperBrowser({
           label="Search term"
           placeholder="Search for papers"
           onChange={(event) => handleSearchChange(event.currentTarget.value)}
+          value={currentSearch}
           leftSection={<IconSearch size={16} />}
           radius="md"
         />
@@ -95,7 +94,7 @@ export function PaperBrowser({
 
                 {paper.content?.pdf && (
                   <Anchor
-                    href={paper.content.pdf.value}
+                    href={`https://openreview.net/pdf?id=${paper.id}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     size="sm"

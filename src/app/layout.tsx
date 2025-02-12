@@ -10,35 +10,11 @@ import {
   mantineHtmlProps,
 } from "@mantine/core";
 import { theme } from "@/config/theme";
-import { CreateDeckModal } from "@/modals/CreateDeckModal";
-import { ModalsProvider } from "@mantine/modals";
-import { ImageOcclusionModal } from "@/modals/ImageOcclusionModal";
 
 export const metadata = {
   title: "Dekki",
   description: "Learn More, Study Less",
 };
-
-const modals = {
-  // deleteUser: DeleteUserModal,
-  // batchAction: BatchActionModal,
-  createDeck: CreateDeckModal,
-  // deleteDeck: DeleteDeckModal,
-  imageOcclusion: ImageOcclusionModal,
-  // renameDeck: RenameDeckModal,
-  // publishDeck: PublishDeckModal,
-  // deckStats: DeckStatsModal,
-  // subscription: SubscriptionModal,
-  // manageSubscription: ManageSubscriptionModal,
-  // previewDeck: PreviewDeckModal,
-  // kbdShortcuts: KeyboardShortcutsModal,
-};
-
-declare module "@mantine/modals" {
-  export interface MantineModalsOverride {
-    modals: typeof modals;
-  }
-}
 
 export default function RootLayout({
   children,
@@ -52,7 +28,7 @@ export default function RootLayout({
       </head>
       <body>
         <MantineProvider theme={theme} defaultColorScheme="light">
-          <ModalsProvider modals={modals}>{children}</ModalsProvider>
+          {children}
         </MantineProvider>
       </body>
     </html>
