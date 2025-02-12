@@ -1,0 +1,127 @@
+.tiptap span[data-highlight-type="highlight-0"] {
+  border: 1px solid gray;
+  padding: 4px;
+  border-radius: 4px;
+  display: inline-block;
+  background-color: lightyellow;
+  color: #404000;
+}
+
+.tiptap span[data-highlight-type="highlight-1"] {
+  border: 1px solid gray;
+  padding: 4px;
+  border-radius: 4px;
+  display: inline-block;
+  background-color: lightgreen;
+  color: #004000;
+}
+
+.tiptap span[data-highlight-type="highlight-2"] {
+  border: 1px solid gray;
+  padding: 4px;
+  border-radius: 4px;
+  display: inline-block;
+  background-color: lightblue;
+  color: #003366;
+}
+
+.tiptap span[data-highlight-type="highlight-3"] {
+  border: 1px solid gray;
+  padding: 4px;
+  border-radius: 4px;
+  display: inline-block;
+  background-color: lightpink;
+  color: #800040;
+}
+
+.tiptap span[data-highlight-type="highlight-4"] {
+  border: 1px solid gray;
+  padding: 4px;
+  border-radius: 4px;
+  display: inline-block;
+  background-color: lavender;
+  color: #4b0082;
+}
+
+.tiptap span[data-highlight-type="highlight-5"] {
+  border: 1px solid gray;
+  padding: 4px;
+  border-radius: 4px;
+  display: inline-block;
+  background-color: lightcyan;
+  color: #006666;
+}
+
+.tiptap span[data-highlight-type="highlight-6"] {
+  border: 1px solid gray;
+  padding: 4px;
+  border-radius: 4px;
+  display: inline-block;
+  background-color: palegreen;
+  color: #005000;
+}
+
+.tiptap span[data-highlight-type="highlight-7"] {
+  border: 1px solid gray;
+  padding: 4px;
+  border-radius: 4px;
+  display: inline-block;
+  background-color: peachpuff;
+  color: #804000;
+}
+
+.tiptap span[data-highlight-type="highlight-8"] {
+  border: 1px solid gray;
+  padding: 4px;
+  border-radius: 4px;
+  display: inline-block;
+  background-color: powderblue;
+  color: #003d4d;
+}
+
+.bubble-menu {
+  display: flex;
+  gap: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  background-color: #fff;
+  padding: 8px;
+  position: absolute;
+  z-index: 100;
+}
+
+.bubble-menu button {
+  border: rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+.ProseMirror:focus {
+  outline: none;
+}
+
+.ProseMirror ul {
+  list-style-type: disc !important;
+  padding-left: 20px !important;
+}
+
+span[text-visible="no"] {
+  color: transparent;
+}
+
+span[background-visible="no"] {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  padding: 0px !important;
+}
+
+.tiptap {
+  border: 1px solid rgba(0, 0, 0, 0);
+  padding: 0;
+  margin: 0;
+}
+
+.tiptap p {
+  margin: 0;
+  padding: 0;
+}

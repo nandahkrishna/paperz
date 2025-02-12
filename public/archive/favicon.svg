@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 32 32">
+  <!-- No 'rect' for background -->
+  <path 
+    d="M16,4
+       a12,12 0 0 1 12,12
+       a12,12 0 0 1-12,12
+       a12,12 0 0 1-3,-0.4
+       l-9,6
+       l3-9
+       a12,12 0 0 1-3-8.6
+       a12,12 0 0 1 12-12
+       z"
+    fill="#2bdd66"
+    stroke="#2bdd66"
+    stroke-width="2"
+    stroke-linejoin="round"
+  />
+</svg>
