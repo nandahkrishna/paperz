@@ -2,15 +2,6 @@ import React from "react";
 import { Stack, Box } from "@mantine/core";
 import { PaperBrowser, PaperBrowserProps } from "@/components/paper-browser";
 
-// const filterPapers = (papers: PaperBrowserProps["papers"], search: string) => {
-//   // Filter papers by search term
-//   return papers.filter((paper) => {
-//     return paper.content?.title.value
-//       .toLowerCase()
-//       .includes(search.toLowerCase());
-//   });
-// };
-
 export default async function Page({
   searchParams,
 }: {

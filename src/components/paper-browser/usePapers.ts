@@ -3,11 +3,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { useDebouncedValue } from "@mantine/hooks";
 import { conferences } from "@/config/conferences";
 import { getNotes, Note } from "@/lib/actions/papers";
-import { PaperBrowserProps } from ".";
 
 export type PaperBrowserSearchParams = { invitation?: string; search?: string };
 
-const filterPapers = (papers: PaperBrowserProps["papers"], search: string) => {
+const filterPapers = (papers: Note[], search: string) => {
   // Filter papers by search term
   return papers.filter((paper) => {
     return paper.content?.title.value
@@ -83,12 +82,15 @@ export default function usePapers({
   useEffect(() => {
     startTransition(async () => {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { search, ...filteredSearchParams } = searchParams;
         const notes = await getNotes(filteredSearchParams);
         setNotes(notes);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(error);
-        setError(error?.message || "Failed to load papers.");
+        setError(
+          error instanceof Error ? error.message : "Failed to load papers."
+        );
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
