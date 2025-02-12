@@ -12,8 +12,8 @@ import {
 import { theme } from "@/config/theme";
 
 export const metadata = {
-  title: "Dekki",
-  description: "Learn More, Study Less",
+  title: "Paperz",
+  description: "Find relevant papers for your research",
 };
 
 export default function RootLayout({
