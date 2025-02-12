@@ -3,8 +3,18 @@ import { usePathname, useRouter } from "next/navigation";
 import { useDebouncedValue } from "@mantine/hooks";
 import { conferences } from "@/config/conferences";
 import { getNotes, Note } from "@/lib/actions/papers";
+import { PaperBrowserProps } from ".";
 
 export type PaperBrowserSearchParams = { invitation?: string; search?: string };
+
+const filterPapers = (papers: PaperBrowserProps["papers"], search: string) => {
+  // Filter papers by search term
+  return papers.filter((paper) => {
+    return paper.content?.title.value
+      .toLowerCase()
+      .includes(search.toLowerCase());
+  });
+};
 
 export default function usePapers({
   searchParams,
@@ -13,6 +23,7 @@ export default function usePapers({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
   const [notes, setNotes] = useState<Note[]>([]);
   const [isFetching, startTransition] = useTransition();
 
@@ -72,17 +83,21 @@ export default function usePapers({
   useEffect(() => {
     startTransition(async () => {
       try {
-        const notes = await getNotes(searchParams);
+        const { search, ...filteredSearchParams } = searchParams;
+        const notes = await getNotes(filteredSearchParams);
         setNotes(notes);
       } catch (error) {
         console.error(error);
+        setError(error?.message || "Failed to load papers.");
       }
     });
-  }, [searchParams]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams.invitation]);
 
   return {
     isFetching,
-    notes,
+    error,
+    notes: filterPapers(notes, debouncedSearch),
     conferences,
     currentConference,
     currentSearch,

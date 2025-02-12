@@ -10,6 +10,7 @@ import {
   Group,
   Autocomplete,
   Box,
+  Center,
 } from "@mantine/core";
 import usePapers from "./usePapers";
 import { IconBooks, IconSearch } from "@tabler/icons-react";
@@ -21,6 +22,7 @@ export type PaperBrowserProps = {
 export function PaperBrowser({ searchParams }: PaperBrowserProps) {
   const {
     isFetching,
+    error,
     notes,
     conferences,
     currentConference,
@@ -59,11 +61,11 @@ export function PaperBrowser({ searchParams }: PaperBrowserProps) {
         />
       </Group>
 
-      {/* {helperText && (
-        <Text size="sm" c="dimmed">
-          {helperText}
+      {error && (
+        <Text size="sm" c="red">
+          {error}
         </Text>
-      )} */}
+      )}
 
       <Box
         style={{
@@ -72,9 +74,15 @@ export function PaperBrowser({ searchParams }: PaperBrowserProps) {
           overflow: "auto",
         }}
       >
-        {isFetching ? (
-          <Text>Loading...</Text>
-        ) : notes.length === 0 ? (
+        {!searchParams.invitation ? (
+          <Center h="100%">
+            <Text>Select a conference to view papers</Text>
+          </Center>
+        ) : isFetching ? (
+          <Center h="100%">
+            <Text>Loading...</Text>
+          </Center>
+        ) : notes.length > 0 ? (
           <Stack gap={"md"}>
             {notes.map((paper, index) => (
               <Card key={index} shadow="sm" padding="lg" radius="md" withBorder>

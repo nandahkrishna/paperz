@@ -29,6 +29,12 @@ export async function getNotes(params: GetNotesParams) {
   const url = `https://api2.openreview.net/notes?${new URLSearchParams(
     params
   )}`;
+
+  // If no `invitation` is provided, return an empty array
+  if (!params.invitation) {
+    return [];
+  }
+
   const response = await fetch(url, {
     method: "GET",
     headers: {},
