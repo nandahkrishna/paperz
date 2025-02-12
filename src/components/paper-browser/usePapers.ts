@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useDebouncedValue } from "@mantine/hooks";
 import { conferences } from "@/config/conferences";
+import { getNotes, Note } from "@/lib/actions/papers";
 
 export type PaperBrowserSearchParams = { invitation?: string; search?: string };
 
@@ -12,6 +13,8 @@ export default function usePapers({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [isFetching, startTransition] = useTransition();
 
   // State for current values
   const [currentSearch, setCurrentSearch] = useState(searchParams.search || "");
@@ -42,14 +45,10 @@ export default function usePapers({
     else router.push(pathname);
   };
 
-  // const handleSearchChange = (searchTerm: string) => {
-  //     router.push(
-  //         pathname + "?" + createQueryString("search", searchTerm)
-  //       );
-  // }
-
   // Find the matching conference label for the current invitation
-  const currentConference = searchParams.invitation;
+  const currentConference =
+    conferences.find((conf) => conf.invitation === searchParams.invitation)
+      ?.label || "";
 
   // Update URL when debounced search changes
   useEffect(() => {
@@ -69,7 +68,21 @@ export default function usePapers({
     setCurrentSearch(value);
   }, []);
 
+  // When the searchParams change, update the current search
+  useEffect(() => {
+    startTransition(async () => {
+      try {
+        const notes = await getNotes(searchParams);
+        setNotes(notes);
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  }, [searchParams]);
+
   return {
+    isFetching,
+    notes,
     conferences,
     currentConference,
     currentSearch,
