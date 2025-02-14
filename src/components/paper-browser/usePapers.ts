@@ -2,22 +2,21 @@ import { useCallback, useEffect, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useDebouncedValue } from "@mantine/hooks";
 import { Tables } from "@/types/database.types";
-import { getPapers } from "@/lib/actions/papers";
+import { getMatchingPapers, PaperSearchParams } from "@/lib/actions/papers";
 
-export type PaperBrowserSearchParams = { invitation?: string; search?: string };
+// export type PaperBrowserSearchParams = {
+//   invitation?: string;
+//   search?: string;
+//   page?: number;
+// };
 
-const filterPapers = (papers: Tables<"papers">[], search: string) => {
-  // Filter papers by search term
-  return papers.filter((paper) => {
-    return `${paper.title}${paper.abstract}`.toLowerCase()
-      .includes(search.toLowerCase());
-  });
-};
-
-export type PaperSearchParams = {
-  venue_id?: string;
-  search?: string;
-};
+// const filterPapers = (papers: Tables<"papers">[], search: string) => {
+//   // Filter papers by search term
+//   return papers.filter((paper) => {
+//     return `${paper.title}${paper.abstract}`.toLowerCase()
+//       .includes(search.toLowerCase());
+//   });
+// };
 
 export default function usePapers({
   venues,
@@ -31,13 +30,13 @@ export default function usePapers({
   const [error, setError] = useState<string | null>(null);
   const [papers, setPapers] = useState<Tables<"papers">[]>([]);
   const [isFetching, startTransition] = useTransition();
-
-  // State for current values
   const [currentSearch, setCurrentSearch] = useState(searchParams.search || "");
   const [debouncedSearch] = useDebouncedValue(currentSearch, 300); // 300ms delay
 
   // Find the matching conference label for the current invitation
   const currentVenue = venues.find((conf) => conf.id === searchParams.venue_id);
+  const filteredPapers = papers;
+  const page = searchParams.page || "1";
 
   const createQueryString = useCallback(
     (name: string, value: string) => {
@@ -63,12 +62,16 @@ export default function usePapers({
     } else router.push(pathname);
   };
 
+  const handleSearchChange = useCallback((value: string) => {
+    setCurrentSearch(value);
+  }, []);
+
   /**
    * When `search` changes, update the URL
    */
   useEffect(() => {
     const params = new URLSearchParams(
-      searchParams as PaperBrowserSearchParams,
+      searchParams,
     );
     if (debouncedSearch) {
       params.set("search", debouncedSearch);
@@ -79,19 +82,47 @@ export default function usePapers({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch, pathname, router]);
 
-  const handleSearchChange = useCallback((value: string) => {
-    setCurrentSearch(value);
+  /**
+   * When the venue_id changes, fetch new papers
+   */
+  // useEffect(() => {
+  //   startTransition(async () => {
+  //     try {
+  //       if (searchParams.venue_id) {
+  //         const fetchedPapers = await getPapers({
+  //           venue_id: searchParams.venue_id,
+  //         });
+  //         setPapers(fetchedPapers);
+  //       }
+  //     } catch (error: unknown) {
+  //       console.error(error);
+  //       setError(
+  //         error instanceof Error ? error.message : "Failed to load papers.",
+  //       );
+  //     }
+  //   });
+  // }, [searchParams.venue_id]);
+
+  // Set default params
+  useEffect(() => {
+    let defaultPath = pathname;
+    if (!searchParams.page) {
+      defaultPath += "?" + createQueryString("page", "1");
+    }
+    router.push(defaultPath);
   }, []);
 
   /**
-   * When the venue_id changes, fetch new papers
+   * When the search term changes, filter papers
    */
   useEffect(() => {
     startTransition(async () => {
       try {
-        if (searchParams.venue_id) {
-          const fetchedPapers = await getPapers({
-            venue_id: searchParams.venue_id,
+        if (currentVenue) {
+          const fetchedPapers = await getMatchingPapers({
+            search: debouncedSearch,
+            page,
+            venue_id: currentVenue?.id || "",
           });
           setPapers(fetchedPapers);
         }
@@ -102,12 +133,12 @@ export default function usePapers({
         );
       }
     });
-  }, [searchParams.venue_id]);
+  }, [debouncedSearch, page, currentVenue]);
 
   return {
     isFetching,
     error,
-    notes: filterPapers(papers, debouncedSearch),
+    notes: filteredPapers,
     currentVenue,
     currentSearch,
     handleConferenceChange: handleVenueChange,
