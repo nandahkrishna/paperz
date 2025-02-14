@@ -37,6 +37,7 @@ export function PaperBrowser({ venues, searchParams }: PaperBrowserProps) {
     <Stack gap="xl" h="100%">
       <Group align="center">
         <Select
+          searchable
           clearable
           label="Conference"
           placeholder="Choose a conference"

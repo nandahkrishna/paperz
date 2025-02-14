@@ -4,20 +4,6 @@ import { useDebouncedValue } from "@mantine/hooks";
 import { Tables } from "@/types/database.types";
 import { getMatchingPapers, PaperSearchParams } from "@/lib/actions/papers";
 
-// export type PaperBrowserSearchParams = {
-//   invitation?: string;
-//   search?: string;
-//   page?: number;
-// };
-
-// const filterPapers = (papers: Tables<"papers">[], search: string) => {
-//   // Filter papers by search term
-//   return papers.filter((paper) => {
-//     return `${paper.title}${paper.abstract}`.toLowerCase()
-//       .includes(search.toLowerCase());
-//   });
-// };
-
 export default function usePapers({
   venues,
   searchParams,
@@ -110,6 +96,7 @@ export default function usePapers({
       defaultPath += "?" + createQueryString("page", "1");
     }
     router.push(defaultPath);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
