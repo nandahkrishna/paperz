@@ -1,5 +1,6 @@
 "use server";
 
+import { Tables } from "@/types/database.types";
 import { createClient } from "@/utils/supabase/server";
 
 // utils/supabase-server.ts
@@ -22,24 +23,36 @@ export async function getPapers({
 const PER_PAGE = 50;
 
 export type PaperSearchParams = {
-  venue_id: string;
+  venue_abbrevs: string[]; // abbrev column
   search?: string;
   page?: string;
+  year_min?: string;
+  year_max?: string;
 };
 
 export async function getMatchingPapers(
-  { search, page, venue_id }: PaperSearchParams,
+  { search, page, venue_abbrevs, year_max, year_min }: PaperSearchParams,
 ) {
   const pageInt = parseInt(page || "1", 10);
   const supabase = await createClient();
+
   if (!search) {
-    const { data, error } = await supabase
-      .from("papers")
-      .select("*")
-      .eq("venue_id", venue_id).range(
-        (pageInt - 1) * PER_PAGE,
-        pageInt * PER_PAGE - 1,
-      );
+    let query = supabase.from("vw_final_papers").select("*").range(
+      (pageInt - 1) * PER_PAGE,
+      pageInt * PER_PAGE - 1,
+    );
+    if (venue_abbrevs && venue_abbrevs.length > 0) {
+      query = query.in("abbrev", venue_abbrevs);
+    }
+
+    if (year_min) {
+      query = query.gte("year", year_min);
+    }
+    if (year_max) {
+      query = query.lte("year", year_max);
+    }
+
+    const { data, error } = await query;
     if (error) {
       throw error;
     }
@@ -52,7 +65,9 @@ export async function getMatchingPapers(
         search,
         page,
         per_page: PER_PAGE,
-        venue_id,
+        venue_abbrevs,
+        year_min,
+        year_max,
       },
     },
   );
@@ -61,7 +76,7 @@ export async function getMatchingPapers(
   }
   // Log to search_logs table
   await supabase.from("search_logs").insert({
-    search_query: JSON.stringify({ search, page, venue_id }),
+    search_query: JSON.stringify({ search, page, venue_abbrevs }),
   });
-  return data?.result;
+  return data?.result as Tables<"vw_final_papers">[];
 }
