@@ -12,8 +12,7 @@ A semantic search engine for academic papers from major ML conferences.
 ## Features
 
 - [x] Search papers using natural language queries
-- [ ] Reverse search using papers
-- [ ] Mars
+- [ ] Reverse search using a paper (graph visualization)
 
 ## Contributing a scraper
 
@@ -32,18 +31,20 @@ class MyScraper(ConferenceScraper):
 
     def get_venue(self, year):
         # Implement this...
+         # Must return a dict with keys: [name, abbrev, year]
 
     def get_papers(self, venue):
         # Implement this...
+        # Must return a dict with keys: [title, authors, abstract, venue_abbrev, venue_year, pdf_url, code_url]
 
     def scrape_year(self, year: int):
-        venue = get_venue(year) # Dict with keys: [name, abbrev, year]
+        venue = get_venue(year) # Dict with keys:
         self.save_venue(venue)
-        for paper in get_papers(venue):  # Dict with keys: [title, authors, abstract, venue_abbrev, venue_year, pdf_url, code_url]
+        for paper in get_papers(venue):
             self.save_paper(paper)
 
 if __name__ == '__main__':
-    scraper = MyScraper(output_dir='data')
+    scraper = MyScraper(output_dir='dumps')
     scraper.scrape_multiple_years([2020, 2021])
 
 ```
