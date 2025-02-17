@@ -1,7 +1,7 @@
 import { getMatchingPapers } from "@/lib/actions/papers";
 import { getVenues } from "@/lib/actions/venues";
 import { PaperBrowser, PaperBrowserProps } from "@/components/paper-browser-v2";
-import { Card, Skeleton, Stack } from "@mantine/core";
+import { Box, Card, Container, Skeleton, Stack } from "@mantine/core";
 import PaperFilterContainer from "@/components/paper-browser-v2/paper-filter-container";
 import { Suspense } from "react";
 
@@ -21,17 +21,29 @@ export default async function PageContainer({
       <Suspense
         fallback={
           <>
-            <PaperFilterContainer
-              venues={[]}
-              searchParams={awaitedSearchParams}
-              isLoading={true}
-            />
-            <LoadingSkeleton />
+            <Container w="100%" size="lg">
+              <PaperFilterContainer
+                venues={[]}
+                searchParams={awaitedSearchParams}
+                isLoading={true}
+              />
+            </Container>
+            <Box flex={1} style={{ overflow: "auto" }}>
+              <Container size="lg">
+                <LoadingSkeleton />
+              </Container>
+            </Box>
           </>
         }
       >
-        <PageFilter searchParams={awaitedSearchParams} />
-        <PageContent venues={[]} searchParams={awaitedSearchParams} />
+        <Container w="100%" size="lg">
+          <PageFilter searchParams={awaitedSearchParams} />
+        </Container>
+        <Box flex={1} style={{ overflow: "auto" }}>
+          <Container size="lg">
+            <PageContent searchParams={awaitedSearchParams} />
+          </Container>
+        </Box>
       </Suspense>
     </Stack>
   );
@@ -48,10 +60,8 @@ async function PageFilter({
 
 async function PageContent({
   searchParams,
-  venues,
 }: {
   searchParams: PaperBrowserProps["searchParams"];
-  venues: PaperBrowserProps["venues"];
 }) {
   const papers = await getMatchingPapers({
     search: searchParams.search,
@@ -59,11 +69,10 @@ async function PageContent({
     page: searchParams.page || "1",
     year_min: searchParams.year_min,
     year_max: searchParams.year_max,
+    has_code: searchParams.has_code,
   });
 
-  return (
-    <PaperBrowser venues={venues} papers={papers} searchParams={searchParams} />
-  );
+  return <PaperBrowser papers={papers} searchParams={searchParams} />;
 }
 
 function LoadingSkeleton() {
