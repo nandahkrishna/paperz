@@ -69,7 +69,7 @@ export async function getMatchingPapers(
     {
       body: {
         search,
-        page,
+        page: page || "1",
         per_page: PER_PAGE,
         venue_abbrevs,
         year_min,
