@@ -14,12 +14,16 @@ export default function PaperFilterContainer({
   venues,
   searchParams,
   isLoading,
+  basePath = "/",
 }: {
   venues: Tables<"vw_final_venues">[];
   searchParams: PaperSearchParams;
   isLoading?: boolean;
+  basePath?: string;
 }) {
-  const { handleSearchClick } = usePapers();
+  const { isRedirecting, handleSearchClick } = usePapers({
+    basePath,
+  });
 
   return (
     <PaperFilters
@@ -36,7 +40,7 @@ export default function PaperFilterContainer({
       }}
       initialHasCode={searchParams.has_code || false}
       onSearchClick={handleSearchClick}
-      isLoading={isLoading}
+      isLoading={isLoading || isRedirecting}
     />
   );
 }

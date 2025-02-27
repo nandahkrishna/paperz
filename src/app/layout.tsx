@@ -1,6 +1,8 @@
 // Import styles of packages that you've installed.
 // All packages except `@mantine/hooks` require styles imports
 import "@mantine/core/styles.css";
+import "katex/dist/katex.min.css";
+import "./styles.css";
 import { Analytics } from "@vercel/analytics/react";
 
 import {

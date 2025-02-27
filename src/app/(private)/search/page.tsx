@@ -6,15 +6,16 @@ import PaperFilterContainer from "@/components/paper-list/paper-filter-container
 import { Suspense } from "react";
 import { getStringList } from "@/utils/misc";
 import ScrollableContainerPinnedHeader from "@/layouts/scrollable-container";
+import { getCollectionPapers } from "@/lib/actions/collections";
 
-export default async function PageContainer({
+export default async function SearchPage({
   searchParams,
 }: {
   searchParams: Promise<PaperBrowserProps["searchParams"]>;
 }) {
   const awaitedSearchParams = await searchParams;
   return (
-    <Stack style={{ height: "100%", overflow: "hidden" }}>
+    <Stack h="100%" w="100%" style={{ height: "100%", overflow: "hidden" }}>
       <Suspense
         fallback={
           <ScrollableContainerPinnedHeader
@@ -48,7 +49,13 @@ async function PaperFilterAsync({
   searchParams: PaperBrowserProps["searchParams"];
 }) {
   const venues = await getVenues();
-  return <PaperFilterContainer venues={venues} searchParams={searchParams} />;
+  return (
+    <PaperFilterContainer
+      venues={venues}
+      searchParams={searchParams}
+      basePath="/search"
+    />
+  );
 }
 
 async function PaperListAsync({
@@ -65,11 +72,15 @@ async function PaperListAsync({
     has_code: searchParams.has_code,
   });
 
+  const collectionPapers = await getCollectionPapers();
+
   return (
     <PaperBrowser
       papers={papers}
       searchParams={searchParams}
-      isLikeVisible={false}
+      collectionPapers={collectionPapers}
+      isLikeVisible
+      isStatsVisible
     />
   );
 }

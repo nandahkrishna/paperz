@@ -34,6 +34,130 @@ export type Database = {
   }
   public: {
     Tables: {
+      collection_papers: {
+        Row: {
+          collection_id: string
+          created_at: string | null
+          paper_id: string
+        }
+        Insert: {
+          collection_id: string
+          created_at?: string | null
+          paper_id: string
+        }
+        Update: {
+          collection_id?: string
+          created_at?: string | null
+          paper_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_papers_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_papers_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "vw_final_collection_papers"
+            referencedColumns: ["collection_id"]
+          },
+          {
+            foreignKeyName: "collection_papers_paper_id_fkey"
+            columns: ["paper_id"]
+            isOneToOne: false
+            referencedRelation: "papers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_papers_paper_id_fkey"
+            columns: ["paper_id"]
+            isOneToOne: false
+            referencedRelation: "vw_final_collection_papers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_papers_paper_id_fkey"
+            columns: ["paper_id"]
+            isOneToOne: false
+            referencedRelation: "vw_final_papers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collections: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      event_log: {
+        Row: {
+          created_at: string | null
+          event: Database["public"]["Enums"]["t_event"]
+          id: string
+          metadata: Json | null
+          paper_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event: Database["public"]["Enums"]["t_event"]
+          id?: string
+          metadata?: Json | null
+          paper_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event?: Database["public"]["Enums"]["t_event"]
+          id?: string
+          metadata?: Json | null
+          paper_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_log_paper_id_fkey"
+            columns: ["paper_id"]
+            isOneToOne: false
+            referencedRelation: "papers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_log_paper_id_fkey"
+            columns: ["paper_id"]
+            isOneToOne: false
+            referencedRelation: "vw_final_collection_papers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_log_paper_id_fkey"
+            columns: ["paper_id"]
+            isOneToOne: false
+            referencedRelation: "vw_final_papers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       papers: {
         Row: {
           abstract: string | null
@@ -128,6 +252,108 @@ export type Database = {
       }
     }
     Views: {
+      vw_derived_event_log_summary: {
+        Row: {
+          last_liked: string | null
+          last_viewed: string | null
+          like_count: number | null
+          net_like_count: number | null
+          paper_id: string | null
+          total_events: number | null
+          unlike_count: number | null
+          view_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_log_paper_id_fkey"
+            columns: ["paper_id"]
+            isOneToOne: false
+            referencedRelation: "papers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_log_paper_id_fkey"
+            columns: ["paper_id"]
+            isOneToOne: false
+            referencedRelation: "vw_final_collection_papers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_log_paper_id_fkey"
+            columns: ["paper_id"]
+            isOneToOne: false
+            referencedRelation: "vw_final_papers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vw_final_collection_papers: {
+        Row: {
+          abbrev: string | null
+          abstract: string | null
+          abstract_embedding: string | null
+          added_at: string | null
+          authors: string[] | null
+          code_url: string | null
+          collection_id: string | null
+          collection_name: string | null
+          created_at: string | null
+          id: string | null
+          like_count: number | null
+          normalized_title: string | null
+          pdf_url: string | null
+          status: string | null
+          title: string | null
+          user_id: string | null
+          venue_id: string | null
+          view_count: number | null
+          year: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "papers_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vw_final_event_log_summary: {
+        Row: {
+          last_liked: string | null
+          last_viewed: string | null
+          like_count: number | null
+          net_like_count: number | null
+          paper_id: string | null
+          total_events: number | null
+          unlike_count: number | null
+          view_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_log_paper_id_fkey"
+            columns: ["paper_id"]
+            isOneToOne: false
+            referencedRelation: "papers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_log_paper_id_fkey"
+            columns: ["paper_id"]
+            isOneToOne: false
+            referencedRelation: "vw_final_collection_papers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_log_paper_id_fkey"
+            columns: ["paper_id"]
+            isOneToOne: false
+            referencedRelation: "vw_final_papers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vw_final_papers: {
         Row: {
           abbrev: string | null
@@ -137,11 +363,13 @@ export type Database = {
           code_url: string | null
           created_at: string | null
           id: string | null
+          like_count: number | null
           normalized_title: string | null
           pdf_url: string | null
           status: string | null
           title: string | null
           venue_id: string | null
+          view_count: number | null
           year: number | null
         }
         Relationships: [
@@ -168,22 +396,26 @@ export type Database = {
           match_threshold: number
         }
         Returns: {
+          abbrev: string | null
           abstract: string | null
           abstract_embedding: string | null
           authors: string[] | null
           code_url: string | null
           created_at: string | null
-          id: string
+          id: string | null
+          like_count: number | null
           normalized_title: string | null
           pdf_url: string | null
           status: string | null
-          title: string
+          title: string | null
           venue_id: string | null
+          view_count: number | null
+          year: number | null
         }[]
       }
     }
     Enums: {
-      [_ in never]: never
+      t_event: "view" | "like" | "unlike" | "share"
     }
     CompositeTypes: {
       [_ in never]: never
