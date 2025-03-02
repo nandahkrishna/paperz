@@ -8,6 +8,8 @@ from base import ConferenceScraper  # Use absolute import
 
 class ICLRScraper(ConferenceScraper):
     """ICLR conference paper scraper"""
+    API_V1_THRESHOLD = 2023
+    API_V1_GET_PARAMS_EXCEPTION = 2017
 
     @property
     def conference_name(self) -> str:
@@ -18,7 +20,7 @@ class ICLRScraper(ConferenceScraper):
         return "International Conference on Learning Representations"
 
     def base_url(self, year: int = None) -> str:
-        api_prefix = "api" if year is not None and year <= 2023 else "api2"
+        api_prefix = "api" if year is not None and year <= self.API_V1_THRESHOLD else "api2"
         return f"https://{api_prefix}.openreview.net"
 
     def get_papers(self, year: int) -> List[Dict]:
@@ -26,7 +28,11 @@ class ICLRScraper(ConferenceScraper):
         paper_data = []
         total_count = 0
         try:
-            url = f"{self.base_url(year)}/notes?content.venueid=ICLR.cc/{year}/Conference"
+            if year <= self.API_V1_THRESHOLD and year != self.API_V1_GET_PARAMS_EXCEPTION:
+                get_params = f"invitation=ICLR.cc/{year}/Conference/-/Blind_Submission&details=directReplies,original"
+            else:
+                get_params = f"content.venueid=ICLR.cc/{year}/{'c' if year == self.API_V1_GET_PARAMS_EXCEPTION else 'C'}onference"
+            url = f"{self.base_url(year)}/notes?{get_params}"
             while True:
                 response = requests.get(url)
                 response.raise_for_status()
@@ -35,10 +41,29 @@ class ICLRScraper(ConferenceScraper):
                 paper_data += notes
                 total_count += len(notes)
                 if total_count < count:
-                    url = f"{self.base_url(year)}/notes?content.venueid=ICLR.cc/{year}/Conference&offset={total_count}"
+                    url = f"{self.base_url(year)}/notes?{get_params}&offset={total_count}"
                     time.sleep(self.delay)
                 else:
                     break
+            # API v1 papers need to be filtered to retain only accepted papers.
+            if year <= self.API_V1_THRESHOLD:
+                # This filter removes rejected submissions for 2017, 2022, and 2023
+                paper_data = [paper for paper in paper_data if "submitted" not in paper.get("content", {}).get("venue", "").lower()]
+                # This filter removes submissions invited to workshops for 2017
+                paper_data = [paper for paper in paper_data if "workshop" not in paper.get("content", {}).get("venue", "").lower()]
+                # This filter removes rejected submissions for 2018-21 (the "recommendation" check is for 2019)
+                if year != self.API_V1_GET_PARAMS_EXCEPTION:
+                    paper_data = [
+                        paper for paper in paper_data
+                        if any(
+                            [
+                                "accept" in reply.get("content", {}).get("decision", "").lower() or
+                                "accept" in reply.get("content", {}).get("recommendation", "").lower()
+                                for reply in paper.get("details", {}).get("directReplies", [])
+                            ]
+                        )
+                    ]
+                tqdm.write(f"Retained only {len(paper_data)} accepted papers for {year}.")
             return paper_data
         except Exception as e:
             print(f"Error fetching papers for year {year}: {str(e)}")
@@ -108,8 +133,8 @@ class ICLRScraper(ConferenceScraper):
                     print(f"\nError processing paper: {str(e)}")
                     continue
 
-# Usage example
 if __name__ == "__main__":
-    # Scrape ICLR papers
+    # Scrape ICLR papers from 2017 onwards
+    # Earlier years aren't well-supported on OpenReview
     iclr_scraper = ICLRScraper(output_dir='dumps/iclr')
-    iclr_scraper.scrape_multiple_years(list(range(2025, 2020, -1)))
+    iclr_scraper.scrape_multiple_years(list(range(2024, 2017 - 1, -1)))
